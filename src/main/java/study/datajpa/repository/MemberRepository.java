@@ -14,7 +14,7 @@ import javax.persistence.QueryHint;
 import java.util.List;
 
 
-public interface MemberRepository extends JpaRepository<Member, Long> {
+public interface MemberRepository extends JpaRepository<Member, Long>, JpaSpecificationExecutor<Member> {
 
   @Lock(LockModeType.PESSIMISTIC_WRITE)
   List<Member> findLockByUsername(String username);
