@@ -50,7 +50,6 @@ class MemberRepositoryTest {
   }
 
   @Test
-  @DisplayName("")
   void queryTest() throws Exception {
     /* GIVEN */
     Team teamA = new Team("teamA");
@@ -113,7 +112,6 @@ class MemberRepositoryTest {
   }
 
   @Test
-  @DisplayName("")
   void bulkUpdate() throws Exception {
     /* GIVEN */
     memberRepository.save(new Member("member1", 10));
@@ -131,7 +129,6 @@ class MemberRepositoryTest {
   }
 
   @Test
-  @DisplayName("")
   void findMemberLazy() throws Exception {
     /* GIVEN */
     Team teamA = new Team("teamA");
@@ -157,7 +154,6 @@ class MemberRepositoryTest {
   }
 
   @Test
-  @DisplayName("")
   void queryHint() throws Exception {
     /* GIVEN */
     Member member1 = new Member("member1", 10);
@@ -176,7 +172,6 @@ class MemberRepositoryTest {
   }
 
   @Test
-  @DisplayName("")
   void lock() throws Exception {
     /* GIVEN */
     Member member1 = new Member("member1", 10);
@@ -192,7 +187,6 @@ class MemberRepositoryTest {
   }
 
   @Test
-  @DisplayName("")
   void specBasic() throws Exception {
     /* GIVEN */
     Team teamA = new Team("teamA");
@@ -212,6 +206,61 @@ class MemberRepositoryTest {
 
     /* THEN */
     assertThat(result.size()).isEqualTo(1);
+
+  }
+
+  @Test
+  void queryByExample() throws Exception {
+    /* GIVEN */
+    Team teamA = new Team("teamA");
+    em.persist(teamA);
+
+    Member m1 = new Member("m1", 0, teamA);
+    Member m2 = new Member("m2", 0, teamA);
+    em.persist(m1);
+    em.persist(m2);
+
+    em.flush();
+    em.clear();
+
+    /* WHEN */
+    //Probe : 필드에 데이터가 있는 실제 도메인 객체
+    Member member = new Member("m1");
+    member.setTeam(teamA);
+
+    ExampleMatcher matcher = ExampleMatcher.matching()
+            .withIgnorePaths("age");
+
+    Example<Member> example = Example.of(member, matcher);
+
+    List<Member> result = memberRepository.findAll(example);
+
+    /* THEN */
+    assertThat(result.get(0).getUsername()).isEqualTo("m1");
+
+  }
+
+  @Test
+  void projections() throws Exception {
+    /* GIVEN */
+    Team teamA = new Team("teamA");
+    em.persist(teamA);
+
+    Member m1 = new Member("m1", 0, teamA);
+    Member m2 = new Member("m2", 0, teamA);
+    em.persist(m1);
+    em.persist(m2);
+
+    em.flush();
+    em.clear();
+
+    /* WHEN */
+    List<UsernameOnly> result = memberRepository.findProjectionsByUsername("m1");
+
+    for (UsernameOnly usernameOnly : result) {
+      System.out.println("usernameOnly = " + usernameOnly.getUsername());
+    }
+    /* THEN */
 
   }
 

@@ -16,6 +16,8 @@ import java.util.List;
 
 public interface MemberRepository extends JpaRepository<Member, Long>, JpaSpecificationExecutor<Member> {
 
+  List<UsernameOnly> findProjectionsByUsername(@Param("username") String username);
+
   @Lock(LockModeType.PESSIMISTIC_WRITE)
   List<Member> findLockByUsername(String username);
 
