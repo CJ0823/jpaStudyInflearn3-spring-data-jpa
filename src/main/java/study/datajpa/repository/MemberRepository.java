@@ -16,7 +16,15 @@ import java.util.List;
 
 public interface MemberRepository extends JpaRepository<Member, Long>, JpaSpecificationExecutor<Member> {
 
-  List<UsernameOnly> findProjectionsByUsername(@Param("username") String username);
+  @Query(value = "select m.member_id as id, m.username, t.name as teamName " +
+          "from member m left join team t ",
+          countQuery = "select count(*) from member ", nativeQuery = true)
+  Page<MemberProjection> findByNativeProjection(Pageable pageable);
+
+  @Query(value = "select * from member where username = ?", nativeQuery = true)
+  Member findByNativeQuery(String username);
+
+  List<NestedClosedProjections> findProjectionsByUsername(@Param("username") String username);
 
   @Lock(LockModeType.PESSIMISTIC_WRITE)
   List<Member> findLockByUsername(String username);

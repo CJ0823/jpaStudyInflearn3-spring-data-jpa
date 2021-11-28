@@ -35,8 +35,8 @@ public class MemberController {
     return memberRepository.findAll(pageable);
   }
 
-  @PostConstruct
-  public void init() {
-    IntStream.range(0, 101).boxed().forEach(i -> memberRepository.save(new Member("user" + i, i)));
-  }
+//  @PostConstruct
+//  public void init() {
+//    IntStream.range(0, 101).boxed().forEach(i -> memberRepository.save(new Member("user" + i, i)));
+//  }
 }

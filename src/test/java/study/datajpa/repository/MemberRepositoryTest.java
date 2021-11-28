@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import study.datajpa.dto.MemberDto;
 import study.datajpa.entity.Member;
@@ -18,6 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @Transactional
+@Rollback(false)
 class MemberRepositoryTest {
 
   @Autowired
@@ -255,13 +257,34 @@ class MemberRepositoryTest {
     em.clear();
 
     /* WHEN */
-    List<UsernameOnly> result = memberRepository.findProjectionsByUsername("m1");
+    List<NestedClosedProjections> result = memberRepository.findProjectionsByUsername("m1");
 
-    for (UsernameOnly usernameOnly : result) {
-      System.out.println("usernameOnly = " + usernameOnly.getUsername());
+    for (NestedClosedProjections usernameOnly : result) {
+      System.out.println("usernameOnly.getUsername() = " + usernameOnly.getUsername());
     }
     /* THEN */
 
   }
 
+  @Test
+  void nativeQuery() throws Exception {
+    /* GIVEN */
+    Team teamA = new Team("teamA");
+    em.persist(teamA);
+
+    Member m1 = new Member("m1", 0, teamA);
+    Member m2 = new Member("m2", 0, teamA);
+    em.persist(m1);
+    em.persist(m2);
+
+    em.flush();
+    em.clear();
+
+    /* WHEN */
+    Member result = memberRepository.findByNativeQuery("m1");
+    System.out.println("result = " + result);
+
+    /* THEN */
+
+  }
 }
